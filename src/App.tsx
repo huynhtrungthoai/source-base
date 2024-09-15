@@ -11,6 +11,7 @@ import {initialWindowMetrics, SafeAreaProvider} from 'react-native-safe-area-con
 import {ErrorBoundary} from './screens/ErrorScreen/ErrorBoundary';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {AppNavigator} from './navigators/AppNavigator';
+import Toast from 'react-native-toast-message';
 
 export const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ErrorBoundary catchErrors={'always'}>
           <AppNavigator />
+          <Toast />
         </ErrorBoundary>
       </QueryClientProvider>
     </SafeAreaProvider>

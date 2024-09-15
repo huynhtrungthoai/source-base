@@ -14,47 +14,17 @@ import {
   ViewStyle,
 } from 'react-native';
 import {colors} from '../theme';
-import {
-  ExtendedEdge,
-  useSafeAreaInsetsStyle,
-} from '../utils/useSafeAreaInsetsStyle';
+import {ExtendedEdge, useSafeAreaInsetsStyle} from '../utils/useSafeAreaInsetsStyle';
 
 interface BaseScreenProps {
-  /**
-   * Children components.
-   */
   children?: React.ReactNode;
-  /**
-   * Style for the outer content container useful for padding & margin.
-   */
   style?: StyleProp<ViewStyle>;
-  /**
-   * Style for the inner content container useful for padding & margin.
-   */
   contentContainerStyle?: StyleProp<ViewStyle>;
-  /**
-   * Override the default edges for the safe area.
-   */
   safeAreaEdges?: ExtendedEdge[];
-  /**
-   * Background color
-   */
   backgroundColor?: string;
-  /**
-   * Status bar setting. Defaults to dark.
-   */
   statusBarStyle?: 'light' | 'dark';
-  /**
-   * By how much should we offset the keyboard? Defaults to 0.
-   */
   keyboardOffset?: number;
-  /**
-   * Pass any additional props directly to the StatusBar component.
-   */
   StatusBarProps?: StatusBarProps;
-  /**
-   * Pass any additional props directly to the KeyboardAvoidingView component.
-   */
   KeyboardAvoidingViewProps?: KeyboardAvoidingViewProps;
 }
 
@@ -63,48 +33,25 @@ interface FixedScreenProps extends BaseScreenProps {
 }
 interface ScrollScreenProps extends BaseScreenProps {
   preset?: 'scroll';
-  /**
-   * Should keyboard persist on screen tap. Defaults to handled.
-   * Only applies to scroll preset.
-   */
   keyboardShouldPersistTaps?: 'handled' | 'always' | 'never';
-  /**
-   * Pass any additional props directly to the ScrollView component.
-   */
   ScrollViewProps?: ScrollViewProps;
 }
 
 interface AutoScreenProps extends Omit<ScrollScreenProps, 'preset'> {
   preset?: 'auto';
-  /**
-   * Threshold to trigger the automatic disabling/enabling of scroll ability.
-   * Defaults to `{ percent: 0.92 }`.
-   */
   scrollEnabledToggleThreshold?: {percent?: number; point?: number};
 }
 
-export type ScreenProps =
-  | ScrollScreenProps
-  | FixedScreenProps
-  | AutoScreenProps;
+export type ScreenProps = ScrollScreenProps | FixedScreenProps | AutoScreenProps;
 
 const isIos = Platform.OS === 'ios';
 
 type ScreenPreset = 'fixed' | 'scroll' | 'auto';
 
-/**
- * @param {ScreenPreset?} preset - The preset to check.
- * @returns {boolean} - Whether the preset is non-scrolling.
- */
 function isNonScrolling(preset?: ScreenPreset) {
   return !preset || preset === 'fixed';
 }
 
-/**
- * Custom hook that handles the automatic enabling/disabling of scroll ability based on the content size and screen size.
- * @param {UseAutoPresetProps} props - The props for the `useAutoPreset` hook.
- * @returns {{boolean, Function, Function}} - The scroll state, and the `onContentSizeChange` and `onLayout` functions.
- */
 function useAutoPreset(props: AutoScreenProps): {
   scrollEnabled: boolean;
   onContentSizeChange: (w: number, h: number) => void;
@@ -118,36 +65,21 @@ function useAutoPreset(props: AutoScreenProps): {
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
   function updateScrollState() {
-    if (
-      scrollViewHeight.current === null ||
-      scrollViewContentHeight.current === null
-    )
-      return;
+    if (scrollViewHeight.current === null || scrollViewContentHeight.current === null) return;
 
-    // check whether content fits the screen then toggle scroll state according to it
     const contentFitsScreen = (function () {
       if (point) {
-        return (
-          scrollViewContentHeight.current < scrollViewHeight.current - point
-        );
+        return scrollViewContentHeight.current < scrollViewHeight.current - point;
       } else {
-        return (
-          scrollViewContentHeight.current < scrollViewHeight.current * percent
-        );
+        return scrollViewContentHeight.current < scrollViewHeight.current * percent;
       }
     })();
 
-    // content is less than the size of the screen, so we can disable scrolling
     if (scrollEnabled && contentFitsScreen) setScrollEnabled(false);
 
-    // content is greater than the size of the screen, so let's enable scrolling
     if (!scrollEnabled && !contentFitsScreen) setScrollEnabled(true);
   }
 
-  /**
-   * @param {number} w - The width of the content.
-   * @param {number} h - The height of the content.
-   */
   function onContentSizeChange(w: number, h: number) {
     // update scroll-view content height
     scrollViewContentHeight.current = h;
@@ -202,9 +134,7 @@ function ScreenWithScrolling(props: ScreenProps) {
 
   const ref = useRef<ScrollView>(null);
 
-  const {scrollEnabled, onContentSizeChange, onLayout} = useAutoPreset(
-    props as AutoScreenProps,
-  );
+  const {scrollEnabled, onContentSizeChange, onLayout} = useAutoPreset(props as AutoScreenProps);
 
   // Add native behavior of pressing the active tab to scroll to the top of the content
   // More info at: https://reactnavigation.org/docs/use-scroll-to-top/
@@ -223,11 +153,7 @@ function ScreenWithScrolling(props: ScreenProps) {
         ScrollViewProps?.onContentSizeChange?.(w, h);
       }}
       style={[$outerStyle, ScrollViewProps?.style, style]}
-      contentContainerStyle={[
-        $innerStyle,
-        ScrollViewProps?.contentContainerStyle,
-        contentContainerStyle,
-      ]}>
+      contentContainerStyle={[$innerStyle, ScrollViewProps?.contentContainerStyle, contentContainerStyle]}>
       {children}
     </ScrollView>
   );
@@ -262,11 +188,7 @@ export function Screen(props: ScreenProps) {
         keyboardVerticalOffset={keyboardOffset}
         {...KeyboardAvoidingViewProps}
         style={[$keyboardAvoidingViewStyle, KeyboardAvoidingViewProps?.style]}>
-        {isNonScrolling(props.preset) ? (
-          <ScreenWithoutScrolling {...props} />
-        ) : (
-          <ScreenWithScrolling {...props} />
-        )}
+        {isNonScrolling(props.preset) ? <ScreenWithoutScrolling {...props} /> : <ScreenWithScrolling {...props} />}
       </KeyboardAvoidingView>
     </View>
   );

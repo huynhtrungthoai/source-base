@@ -1,218 +1,153 @@
-import React, {ComponentType} from 'react';
+import React, {useState} from 'react';
 import {
   Pressable,
-  PressableProps,
-  PressableStateCallbackType,
+  ActivityIndicator,
+  GestureResponderEvent,
   StyleProp,
-  TextStyle,
   ViewStyle,
+  TextStyle,
+  StyleSheet,
+  Text,
 } from 'react-native';
-import {colors, spacing} from '../theme';
-import {Text, TextProps} from './Text';
+import {omit} from 'lodash';
+import Metrics from '../theme/metrics';
+import {colors} from '../theme';
 
-type Presets = keyof typeof $viewPresets;
-
-export interface ButtonAccessoryProps {
-  style: StyleProp<any>;
-  pressableState: PressableStateCallbackType;
-  disabled?: boolean;
-}
-
-export interface ButtonProps extends PressableProps {
-  /**
-   * The text to display if not using `tx` or nested components.
-   */
-  text?: TextProps['text'];
-  /**
-   * An optional style override useful for padding & margin.
-   */
+interface ButtonProps {
+  loading?: boolean;
+  disable?: boolean;
   style?: StyleProp<ViewStyle>;
-  /**
-   * An optional style override for the "pressed" state.
-   */
-  pressedStyle?: StyleProp<ViewStyle>;
-  /**
-   * An optional style override for the button text.
-   */
   textStyle?: StyleProp<TextStyle>;
-  /**
-   * An optional style override for the button text when in the "pressed" state.
-   */
-  pressedTextStyle?: StyleProp<TextStyle>;
-  /**
-   * An optional style override for the button text when in the "disabled" state.
-   */
-  disabledTextStyle?: StyleProp<TextStyle>;
-  /**
-   * One of the different types of button presets.
-   */
-  preset?: Presets;
-  /**
-   * An optional component to render on the right side of the text.
-   * Example: `RightAccessory={(props) => <View {...props} />}`
-   */
-  RightAccessory?: ComponentType<ButtonAccessoryProps>;
-  /**
-   * An optional component to render on the left side of the text.
-   * Example: `LeftAccessory={(props) => <View {...props} />}`
-   */
-  LeftAccessory?: ComponentType<ButtonAccessoryProps>;
-  /**
-   * Children components.
-   */
+  activeOpacity?: number;
   children?: React.ReactNode;
-  /**
-   * disabled prop, accessed directly for declarative styling reasons.
-   * https://reactnative.dev/docs/pressable#disabled
-   */
-  disabled?: boolean;
-  /**
-   * An optional style override for the disabled state
-   */
-  disabledStyle?: StyleProp<ViewStyle>;
+  type?: 'default' | 'outline' | 'alert';
+  size?: 'sm' | 'md' | 'lg';
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  onPress?: (e: GestureResponderEvent) => void;
+  onLongPress?: (e: GestureResponderEvent) => void;
+  onPressIn?: (e: GestureResponderEvent) => void;
+  onPressOut?: (e: GestureResponderEvent) => void;
 }
 
-/**
- * @example
- * <Button
- *   tx="common.ok"
- *   style={styles.button}
- *   textStyle={styles.buttonText}
- *   onPress={handleButtonPress}
- * />
- */
-export function Button(props: ButtonProps) {
+export const Button = (props: ButtonProps) => {
+  const [pressed, setPressed] = useState<boolean>(false);
   const {
-    text,
-    style: $viewStyleOverride,
-    pressedStyle: $pressedViewStyleOverride,
-    textStyle: $textStyleOverride,
-    pressedTextStyle: $pressedTextStyleOverride,
-    disabledTextStyle: $disabledTextStyleOverride,
+    loading = false,
+    style,
+    textStyle,
     children,
-    RightAccessory,
-    LeftAccessory,
-    disabled,
-    disabledStyle: $disabledViewStyleOverride,
-    ...rest
+    type = 'default',
+    size = 'lg',
+    disable = false,
+    leftIcon = null,
+    rightIcon = null,
+    onPress,
+    onLongPress,
+    onPressIn,
+    onPressOut,
   } = props;
 
-  const preset: Presets = props.preset ?? 'default';
+  const onButtonPress = (e: GestureResponderEvent) => {
+    if (!disable) {
+      onPress && onPress(e);
+    }
+  };
 
-  function $viewStyle({
-    pressed,
-  }: PressableStateCallbackType): StyleProp<ViewStyle> {
-    return [
-      $viewPresets[preset],
-      $viewStyleOverride,
-      !!pressed && [$pressedViewPresets[preset], $pressedViewStyleOverride],
-      !!disabled && $disabledViewStyleOverride,
-    ];
-  }
+  const onButtonLongPress = (e: GestureResponderEvent) => {
+    if (!disable) {
+      onLongPress && onLongPress(e);
+    }
+  };
 
-  function $textStyle({
-    pressed,
-  }: PressableStateCallbackType): StyleProp<TextStyle> {
-    return [
-      $textPresets[preset],
-      $textStyleOverride,
-      !!pressed && [$pressedTextPresets[preset], $pressedTextStyleOverride],
-      !!disabled && $disabledTextStyleOverride,
-    ];
-  }
+  const onButtonPressIn = (e: GestureResponderEvent) => {
+    if (!disable) {
+      setPressed(true);
+      onPressIn && onPressIn(e);
+    }
+  };
+
+  const onButtonPressOut = (e: GestureResponderEvent) => {
+    if (!disable) {
+      setPressed(false);
+      onPressOut && onPressOut(e);
+    }
+  };
+
+  const _buttonStyle = StyleSheet.flatten([
+    styles.buttonContainer,
+    styles[`${size}Button`],
+    styles[`${type}Background`],
+    {...(pressed && {opacity: 0.6})},
+    {...(disable && {opacity: 0.7})},
+    style,
+  ]);
+
+  const _textStyle = [styles[`${size}Text`], styles[`${type}TextColor`], textStyle];
 
   return (
     <Pressable
-      style={$viewStyle}
-      accessibilityRole="button"
-      accessibilityState={{disabled: !!disabled}}
-      {...rest}
-      disabled={disabled}>
-      {state => (
-        <>
-          {!!LeftAccessory && (
-            <LeftAccessory
-              style={$leftAccessoryStyle}
-              pressableState={state}
-              disabled={disabled}
-            />
-          )}
-
-          <Text text={text} style={$textStyle(state)}>
-            {children}
-          </Text>
-
-          {!!RightAccessory && (
-            <RightAccessory
-              style={$rightAccessoryStyle}
-              pressableState={state}
-              disabled={disabled}
-            />
-          )}
-        </>
-      )}
+      {...omit(props, ['children', 'style', 'textStyle'])}
+      disabled={disable}
+      onPress={onButtonPress}
+      onLongPress={onButtonLongPress}
+      onPressIn={onButtonPressIn}
+      onPressOut={onButtonPressOut}
+      style={_buttonStyle}>
+      {loading ? (
+        <ActivityIndicator
+          animating
+          size={'small'}
+          color={styles[`${type}IndicatorColor`].color}
+          style={styles[`${size}Indicator`]}
+        />
+      ) : null}
+      {leftIcon && leftIcon}
+      <Text style={_textStyle}>{children}</Text>
+      {rightIcon && rightIcon}
     </Pressable>
   );
-}
-
-const $baseViewStyle: ViewStyle = {
-  minHeight: 56,
-  borderRadius: 4,
-  justifyContent: 'center',
-  alignItems: 'center',
-  flexDirection: 'row',
-  paddingVertical: spacing.sm,
-  paddingHorizontal: spacing.sm,
-  overflow: 'hidden',
 };
 
-const $baseTextStyle: TextStyle = {
-  fontSize: 16,
-  lineHeight: 20,
-  textAlign: 'center',
-  flexShrink: 1,
-  flexGrow: 0,
-  zIndex: 2,
-};
+const styles = StyleSheet.create({
+  buttonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: Metrics.SPACING_SM,
+    borderRadius: Metrics.RADIUS_SM,
+  },
+  // Button size
+  smButton: {height: Metrics.BUTTON_SM},
+  mdButton: {height: Metrics.BUTTON_MD},
+  lgButton: {height: Metrics.BUTTON_LG},
 
-const $rightAccessoryStyle: ViewStyle = {marginStart: spacing.xs, zIndex: 1};
-const $leftAccessoryStyle: ViewStyle = {marginEnd: spacing.xs, zIndex: 1};
+  // Font size
+  smText: {fontSize: Metrics.FONT_SM, fontWeight: '600'},
+  mdText: {fontSize: Metrics.FONT_MD, fontWeight: '600'},
+  lgText: {fontSize: Metrics.FONT_LG, fontWeight: '600'},
 
-const $viewPresets = {
-  default: [
-    $baseViewStyle,
-    {
-      borderWidth: 1,
-      borderColor: colors.palette.neutral400,
-      backgroundColor: colors.palette.neutral100,
-    },
-  ] as StyleProp<ViewStyle>,
+  // Indicator size
+  smIndicator: {transform: [{scale: 0.6}], marginRight: Metrics.SPACING_XS},
+  mdIndicator: {transform: [{scale: 0.8}], marginRight: Metrics.SPACING_XS},
+  lgIndicator: {transform: [{scale: 1}], marginRight: Metrics.SPACING_XS},
 
-  filled: [
-    $baseViewStyle,
-    {backgroundColor: colors.palette.neutral300},
-  ] as StyleProp<ViewStyle>,
+  // Button background color
+  defaultBackground: {backgroundColor: colors.palette.primary500},
+  outlineBackground: {
+    borderWidth: 1,
+    borderColor: colors.palette.primary500,
+    backgroundColor: colors.palette.neutral100,
+  },
+  alertBackground: {backgroundColor: colors.error},
 
-  reversed: [
-    $baseViewStyle,
-    {backgroundColor: colors.palette.neutral800},
-  ] as StyleProp<ViewStyle>,
-};
+  // Text color
+  defaultTextColor: {color: colors.palette.neutral100},
+  outlineTextColor: {color: colors.palette.primary500},
+  alertTextColor: {color: colors.palette.neutral100},
 
-const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
-  default: $baseTextStyle,
-  filled: $baseTextStyle,
-  reversed: [$baseTextStyle, {color: colors.palette.neutral100}],
-};
-
-const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
-  default: {backgroundColor: colors.palette.neutral200},
-  filled: {backgroundColor: colors.palette.neutral400},
-  reversed: {backgroundColor: colors.palette.neutral700},
-};
-
-const $pressedTextPresets: Record<Presets, StyleProp<TextStyle>> = {
-  default: {opacity: 0.9},
-  filled: {opacity: 0.9},
-  reversed: {opacity: 0.9},
-};
+  // Indicator color
+  defaultIndicatorColor: {color: colors.palette.neutral100},
+  outlineIndicatorColor: {color: colors.errorBackground},
+  alertIndicatorColor: {color: colors.palette.neutral100},
+});

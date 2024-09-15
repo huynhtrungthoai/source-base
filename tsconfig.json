@@ -25,7 +25,8 @@
       "@screen": ["./src/screens"],
       "@services": ["./src/services"],
       "@theme": ["./src/theme"],
-      "@utils": ["./src/utils"]
+      "@utils": ["./src/utils"],
+      "@store": ["./src/store"]
     }
   },
   "ts-node": {
@@ -36,14 +37,6 @@
       "module": "commonjs"
     }
   },
-  "include": [
-    "./src",
-    "index.js",
-    "App.tsx",
-    "app",
-    "types",
-    "plugins",
-    "app.config.ts"
-  ],
+  "include": ["./src", "index.js", "App.tsx", "app", "types", "plugins", "app.config.ts"],
   "exclude": ["node_modules"]
 }

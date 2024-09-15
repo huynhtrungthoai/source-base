@@ -3,7 +3,7 @@ import {globalConfigs} from './globalConfig';
 
 export const api = axios.create({
   baseURL: globalConfigs.BASE_URL,
-  timeout: 30000,
+  timeout: 10000,
   headers: {'Content-Type': 'application/json'},
 });
 

@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  StyleProp,
-  Text as RNText,
-  TextProps as RNTextProps,
-  TextStyle,
-} from 'react-native';
+import {StyleProp, Text as RNText, TextProps as RNTextProps, TextStyle} from 'react-native';
 
 import {colors, fontWeight} from '../theme';
 
@@ -13,29 +8,11 @@ type Weights = keyof typeof fontWeight;
 type Presets = keyof typeof $presets;
 
 export interface TextProps extends RNTextProps {
-  /**
-   * The text to display if not using `tx` or nested components.
-   */
   text?: string;
-  /**
-   * An optional style override useful for padding & margin.
-   */
   style?: StyleProp<TextStyle>;
-  /**
-   * One of the different types of text presets.
-   */
   preset?: Presets;
-  /**
-   * Text weight modifier.
-   */
   weight?: Weights;
-  /**
-   * Text size modifier.
-   */
   size?: Sizes;
-  /**
-   * Children components.
-   */
   children?: React.ReactNode;
 }
 
@@ -69,41 +46,22 @@ const $sizeStyles = {
   xxs: {fontSize: 12, lineHeight: 18} satisfies TextStyle,
 };
 
-const $fontWeightStyles = Object.entries(fontWeight.regular).reduce(
-  (acc, [weight, fontFamily]) => {
-    return {...acc, [weight]: {fontFamily}};
-  },
-  {},
-) as Record<Weights, TextStyle>;
+const $fontWeightStyles = Object.entries(fontWeight.regular).reduce((acc, [weight, fontFamily]) => {
+  return {...acc, [weight]: {fontFamily}};
+}, {}) as Record<Weights, TextStyle>;
 
-const $baseStyle: StyleProp<TextStyle> = [
-  $sizeStyles.sm,
-  $fontWeightStyles.regular,
-  {color: colors.text},
-];
+const $baseStyle: StyleProp<TextStyle> = [$sizeStyles.sm, $fontWeightStyles.regular, {color: colors.text}];
 
 const $presets = {
   default: $baseStyle,
 
   bold: [$baseStyle, $fontWeightStyles.bold] as StyleProp<TextStyle>,
 
-  heading: [
-    $baseStyle,
-    $sizeStyles.xxl,
-    $fontWeightStyles.bold,
-  ] as StyleProp<TextStyle>,
+  heading: [$baseStyle, $sizeStyles.xxl, $fontWeightStyles.bold] as StyleProp<TextStyle>,
 
-  subheading: [
-    $baseStyle,
-    $sizeStyles.lg,
-    $fontWeightStyles.regular,
-  ] as StyleProp<TextStyle>,
+  subheading: [$baseStyle, $sizeStyles.lg, $fontWeightStyles.regular] as StyleProp<TextStyle>,
 
   formLabel: [$baseStyle, $fontWeightStyles.regular] as StyleProp<TextStyle>,
 
-  formHelper: [
-    $baseStyle,
-    $sizeStyles.sm,
-    $fontWeightStyles.regular,
-  ] as StyleProp<TextStyle>,
+  formHelper: [$baseStyle, $sizeStyles.sm, $fontWeightStyles.regular] as StyleProp<TextStyle>,
 };

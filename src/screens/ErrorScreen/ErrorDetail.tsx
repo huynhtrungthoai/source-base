@@ -9,41 +9,23 @@ export interface ErrorDetailsProps {
   onReset(): void;
 }
 
-/**
- * Renders the error details screen.
- * @param {ErrorDetailsProps} props - The props for the `ErrorDetails` component.
- * @returns {JSX.Element} The rendered `ErrorDetails` component.
- */
 export function ErrorDetails(props: ErrorDetailsProps) {
   return (
     <View style={$contentContainer}>
       <View style={$topSection}>
         {/* <Icon icon="ladybug" size={64} /> */}
-        <Text style={$heading}>{'Lỗi'}</Text>
-        <Text>{'Lỗi rùi'}</Text>
+        <Text style={$heading}>{'Error'}</Text>
+        <Text>{'Oops!'}</Text>
       </View>
 
-      <ScrollView
-        style={$errorSection}
-        contentContainerStyle={$errorSectionContentContainer}>
-        <Text
-          style={$errorContent}
-          weight="bold"
-          text={`${props.error}`.trim()}
-        />
-        <Text
-          selectable
-          style={$errorBacktrace}
-          text={`${props.errorInfo?.componentStack ?? ''}`.trim()}
-        />
+      <ScrollView style={$errorSection} contentContainerStyle={$errorSectionContentContainer}>
+        <Text style={$errorContent} weight="bold" text={`${props.error}`.trim()} />
+        <Text selectable style={$errorBacktrace} text={`${props.errorInfo?.componentStack ?? ''}`.trim()} />
       </ScrollView>
 
-      <Button
-        preset="reversed"
-        style={$resetButton}
-        onPress={props.onReset}
-        tx="errorScreen.reset"
-      />
+      <Button style={$resetButton} onPress={props.onReset}>
+        {'Reset'}
+      </Button>
     </View>
   );
 }
