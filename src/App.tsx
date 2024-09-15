@@ -7,19 +7,21 @@ if (__DEV__) {
 import './utils/gestureHandler';
 import './utils/ignoreWarnings';
 import React from 'react';
-import {
-  initialWindowMetrics,
-  SafeAreaProvider,
-} from 'react-native-safe-area-context';
+import {initialWindowMetrics, SafeAreaProvider} from 'react-native-safe-area-context';
 import {ErrorBoundary} from './screens/ErrorScreen/ErrorBoundary';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {AppNavigator} from './navigators/AppNavigator';
+
+export const queryClient = new QueryClient();
 
 function App() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ErrorBoundary catchErrors={'always'}>
-        <AppNavigator />
-      </ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ErrorBoundary catchErrors={'always'}>
+          <AppNavigator />
+        </ErrorBoundary>
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }

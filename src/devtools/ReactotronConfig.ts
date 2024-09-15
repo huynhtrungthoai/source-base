@@ -102,7 +102,7 @@ reactotron.onCustomCommand({
  *
  * Use this power responsibly! :)
  */
-console.tron = reactotron;
+console.log = Reactotron.log;
 
 /**
  * We tell typescript about our dark magic
