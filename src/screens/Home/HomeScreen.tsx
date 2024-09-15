@@ -15,12 +15,16 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 interface HomeScreenProps extends AppStackScreenProps<ScreenConst.HOME_STACK> {}
 
 export const HomeScreen: FC<HomeScreenProps> = function HomeScreen(_props) {
-  const {data} = AppServices.GetBlogQuery();
+  const {data, refetch} = AppServices.GetBlogQuery();
   const insets = useSafeAreaInsets();
   const confirmRef = createRef<any>();
   const {favoriteList, updateFavoriteList} = useAppStore();
   const [existItem, setExistItem] = useState<IBlog | undefined>(undefined);
   const selectedItem = useRef<IBlog>();
+
+  const onRefresh = () => {
+    refetch();
+  };
 
   const onFavoritePress = (item: IBlog) => {
     const findExist = favoriteList.find(blogItem => blogItem?.id === item?.id);
@@ -58,7 +62,7 @@ export const HomeScreen: FC<HomeScreenProps> = function HomeScreen(_props) {
           </Text>
         }
       />
-      <BlogList data={data?.results} onFavoritePress={onFavoritePress} />
+      <BlogList data={data?.results} onFavoritePress={onFavoritePress} onRefresh={onRefresh} />
     </Screen>
   );
 };
