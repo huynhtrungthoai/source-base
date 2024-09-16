@@ -41,7 +41,7 @@ export const BlogList: FC<BlogListProps> = _props => {
 
   const renderItem = ({item}: {item: IBlog}) => {
     return (
-      <TouchableOpacity onPress={() => onItemPress(item)}>
+      <TouchableOpacity activeOpacity={0.6} onPress={() => onItemPress(item)}>
         <Image source={{uri: item?.image_url}} style={styles.image} />
         <Text size="md" style={styles.title}>
           {item?.title}
@@ -63,12 +63,12 @@ export const BlogList: FC<BlogListProps> = _props => {
 
   const renderEmpty = () => (
     <View style={styles.emptyView}>
-      <Text>{'No favorite blog'}</Text>
+      <Text>{favoriteMode ? 'No favorite blog' : 'No data'}</Text>
     </View>
   );
 
   const renderFooter = () => {
-    if (!isEmpty(data)) {
+    if (!isEmpty(data) && !favoriteMode) {
       return (
         <View style={styles.footerView}>
           <Text>{'Oops! No more to load'}</Text>

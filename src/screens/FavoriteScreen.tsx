@@ -49,7 +49,7 @@ export const FavoriteScreen: FC<FavoriteScreenProps> = function FavoriteScreen(_
         onSubmit={onUpdateFavorite}
         children={<Text>{'You want to remove this blog from favorite?'}</Text>}
       />
-      <BlogList data={favoriteList} onFavoritePress={onFavoritePress} style={styles.blogContent} />
+      <BlogList favoriteMode data={favoriteList} onFavoritePress={onFavoritePress} style={styles.blogContent} />
     </View>
   );
 };

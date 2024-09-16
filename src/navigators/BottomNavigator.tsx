@@ -1,7 +1,7 @@
 import {BottomTabScreenProps as BottomTabProps, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import React from 'react';
-import {Image, ImageSourcePropType, StyleSheet} from 'react-native';
+import {Image, ImageSourcePropType, StyleSheet, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {colors, spacing} from '../theme';
 import {AppStackParamList, AppStackScreenProps} from './AppNavigator';
@@ -24,15 +24,18 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 export function BottomNavigator() {
   const {bottom} = useSafeAreaInsets();
 
-  const renderTitle = (title: string, focused: boolean) => (
-    <Text style={{color: focused ? colors.palette.primary500 : undefined, fontWeight: focused ? '600' : undefined}}>
-      {title}
-    </Text>
-  );
+  const renderTitle = () => <></>;
 
-  const renderIcon = (icon: ImageSourcePropType, focused: boolean) => (
-    <Image source={icon} style={focused ? styles.iconBigSize : styles.iconSize} />
-  );
+  const renderIcon = (text: string, icon: ImageSourcePropType, focused: boolean) => {
+    return (
+      <View style={styles.iconContainer}>
+        <Image source={icon} style={focused ? styles.iconBigSize : styles.iconSize} />
+        <Text style={{color: focused ? colors.palette.primary500 : undefined, fontWeight: focused ? '600' : undefined}}>
+          {text}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <Tab.Navigator
@@ -49,8 +52,8 @@ export function BottomNavigator() {
         name="HomeScreen"
         component={Screens.HomeScreen as never}
         options={{
-          tabBarLabel: ({focused}) => renderTitle('Home', focused),
-          tabBarIcon: ({focused}) => renderIcon(Images.iconHome, focused),
+          tabBarLabel: () => renderTitle(),
+          tabBarIcon: ({focused}) => renderIcon('Home', Images.iconHome, focused),
         }}
       />
 
@@ -58,8 +61,8 @@ export function BottomNavigator() {
         name="FavoriteScreen"
         component={Screens.FavoriteScreen as never}
         options={{
-          tabBarLabel: ({focused}) => renderTitle('Favorite', focused),
-          tabBarIcon: ({focused}) => renderIcon(Images.iconHeart, focused),
+          tabBarLabel: () => renderTitle(),
+          tabBarIcon: ({focused}) => renderIcon('Favorite', Images.iconHeart, focused),
         }}
       />
     </Tab.Navigator>
@@ -67,13 +70,14 @@ export function BottomNavigator() {
 }
 
 const styles = StyleSheet.create({
+  iconContainer: {minWidth: 70, alignItems: 'center'},
   tabBar: {
     borderTopWidth: 1,
     backgroundColor: colors.background,
     borderTopColor: '#C4C4C4',
   },
   tabBarItem: {
-    paddingTop: spacing.md,
+    paddingVertical: spacing.md,
   },
   tabBarLabel: {
     fontSize: 12,
