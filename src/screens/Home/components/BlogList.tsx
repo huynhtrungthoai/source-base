@@ -9,6 +9,7 @@ import {useAppStore} from '../../../store/useAppStore';
 import {isEmpty} from 'lodash';
 import Metrics from '../../../theme/metrics';
 import moment from 'moment';
+import {colors} from '../../../theme';
 
 interface BlogListProps {
   data: IBlog[] | undefined;
@@ -47,7 +48,7 @@ export const BlogList: FC<BlogListProps> = _props => {
           {item?.title}
         </Text>
         <Text style={styles.subTitle} numberOfLines={2}>
-          Create at: {moment(item?.published_at).format('DD/MM/YYYY')}
+          Created at: {moment(item?.published_at).format('DD/MM/YYYY')}
         </Text>
         <Text style={styles.subTitle} numberOfLines={2}>
           {item?.summary}
@@ -75,7 +76,7 @@ export const BlogList: FC<BlogListProps> = _props => {
         </View>
       );
     } else {
-      return <></>;
+      return <View style={styles.footerView} />;
     }
   };
 
@@ -97,7 +98,13 @@ export const BlogList: FC<BlogListProps> = _props => {
 
 const styles = StyleSheet.create({
   separator: {height: 32},
-  image: {height: undefined, width: '100%', aspectRatio: 1.9},
+  image: {
+    height: undefined,
+    width: '100%',
+    aspectRatio: 1.9,
+    backgroundColor: colors.palette.neutral300,
+    borderRadius: 8,
+  },
   title: {fontWeight: 'bold', marginTop: 12},
   subTitle: {marginTop: 4},
   iconSize: {height: 32, width: 32},
